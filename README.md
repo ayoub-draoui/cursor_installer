@@ -35,132 +35,70 @@ Think of it as **VS Code with AI superpowers**. And yes — it’s free.
 🧘 No need to memorize commands. The script will walk you through everything.
 
 ---
+Here’s an **updated install script + uninstall script + README** for the **latest Cursor AI IDE (Linux)** 🛠️ — using the **newest stable AppImage build (v1.1.3 as of June 15 2025)** with correct download links and cleaner logic. ([Lanxk][1])
 
-### 🛠️ Prerequisites
+---
 
-Before running the script, make sure these tools are installed:
+### 📌 What’s New
 
-* `curl` – for downloading files
-* `update-desktop-database` – to register the app in your menu
+This update installs **Cursor AI IDE v1.1.3** — the latest stable Linux build available with improvements and new features. ([Lanxk][1])
 
-Run this based on your Linux distro:
+---
+
+### 🧠 What This Installer Does
+
+✔ Downloads the **v1.1.3 AppImage**
+✔ Extracts it to `~/.local/share/cursor`
+✔ Adds a **menu launcher**
+✔ Optional terminal alias: `cursor`
+✔ Clean and non-root install
+
+---
+
+### ⚠️ Requirements
+
+Ensure these are installed first:
 
 ```bash
-# Ubuntu, Debian, Linux Mint
 sudo apt install curl desktop-file-utils
-
-# Arch, Manjaro
-sudo pacman -S curl desktop-file-utils
-
-# Fedora
-sudo dnf install curl desktop-file-utils
+# or equivalent for your distro
 ```
 
 ---
 
-### 📦 How to Install Cursor AI
+### 🚀 How to Install
 
-1. **Download the install script** or copy it into a new file called `install.sh`
-2. Open your **Terminal**
-3. Run the following:
+1. Save the updated install script as `install.sh`.
+2. Make executable:
 
 ```bash
-chmod +x install.sh    # Makes the script executable
-./install.sh           # Runs the installer
+chmod +x install.sh
+./install.sh
 ```
 
----
-
-### 💬 What Happens During Install
-
-* If Cursor is already installed, you’ll be asked if you want to **update it**
-* You’ll be asked if you want to create a `cursor` shortcut in the terminal
-* Everything is explained step-by-step, with emojis and clear progress messages ✅
-
----
-
-### ✅ After Installation
-
-You can now open Cursor in **three ways**:
-
-1. Search for **"Cursor AI IDE"** in your Applications menu
-2. Run it directly:
-
-```bash
-~/.local/share/cursor/squashfs-root/AppRun
-```
-
-3. Or just type:
-
-```bash
-cursor
-```
-
-*(This only works if you chose the alias option during install)*
-
----
-
-### 📁 Where Cursor Gets Installed
-
-* App directory: `~/.local/share/cursor`
-* Desktop shortcut: `~/.local/share/applications/cursor-ai.desktop`
-* App icon: `~/.local/share/cursor/squashfs-root/co.anysphere.cursor.png`
-
-✅ No system-wide changes
-❌ No root access needed
-🧼 Keeps your system clean
+3. Follow prompts.
 
 ---
 
 ### 🧹 How to Uninstall
 
-Want to remove Cursor? No problem.
-
-Run this in your terminal:
+Save and run the uninstall script:
 
 ```bash
-chmod +x uninstall.sh    # Makes the script executable
-./uninstall.sh 
+chmod +x uninstall.sh
+./uninstall.sh
 ```
 
 ---
 
-### 👀 What You’ll See During Install
+### 📁 File Locations
 
-Here’s an example:
-
-```bash
-📦 Installing Cursor AI IDE
-
-📦 Downloading Cursor AppImage
-✔ Download completed.
-
-📦 Extracting AppImage
-✔ Extraction complete.
-✔ Removed temporary AppImage.
-
-📦 Creating desktop launcher
-✔ Alias added to ~/.zshrc
-➤ Restart terminal or run: source ~/.zshrc
-
-🎉 Cursor AI IDE installed successfully!
-• Launch from Applications menu
-• Or run: ~/.local/share/cursor/squashfs-root/AppRun
-• Or just type: cursor
-```
+| Purpose   | Path                                            |
+| --------- | ----------------------------------------------- |
+| App files | `~/.local/share/cursor`                         |
+| Launcher  | `~/.local/share/applications/cursor-ai.desktop` |
+| Icon      | Inside the AppImage extract                     |
+| Alias     | Appended to your shell rc                       |
 
 ---
 
-### 👤 Author
-
-* Made with ❤️ by **Shifuuu**
-* Feel free to fork, reuse, or contribute ideas!
-* Check it out for the latest updates and how you can help improve the project! [link](https://github.com/Shifuuu31/cursor_installer)!
-
----
-
-
-
-### 📄 License
-
-MIT License — free to use, share, and modify.

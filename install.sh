@@ -1,14 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Cursor AI Installer Script - Enhanced UX + Icon Fix
+# Cursor AI Installer Script (Updated to Latest Version v1.1.3)
 # Website: https://cursor.so
-# Author: shifuuu31
+# Installer Maintainer: Updated by ChatGPT
 
+set -e
 
-
-# =========================
-#      Style Settings
-# =========================
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -18,99 +16,83 @@ RESET='\033[0m'
 CHECK="${GREEN}✔${RESET}"
 CROSS="${RED}✖${RESET}"
 
-# =========================
-#     Spinner Function
-# =========================
+# Spinner
 spinner() {
   local pid=$1
   local delay=0.1
   local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
-  local i=0
-  tput civis  # Hide cursor
+  tput civis
   while kill -0 "$pid" 2>/dev/null; do
-    i=$(( (i+1) % 10 ))
-    printf "\r  ${BLUE}↻ ${spinstr:$i:1} $SPINNER_MSG...${RESET}"
+    printf "\r  ${BLUE}↻ ${spinstr:RANDOM%${#spinstr}:1} $SPINNER_MSG...${RESET}"
     sleep "$delay"
   done
-  tput cnorm  # Show cursor
+  tput cnorm
   printf "\r  ${GREEN}✔ $SPINNER_MSG completed.${RESET}\n"
 }
 
-# =========================
-#     Function Helpers
-# =========================
-step()          { echo -e "\n${BLUE}${BOLD}📦 $*${RESET}"; }
-echo_info()     { echo -e "${BLUE}${BOLD}➤ $*${RESET}"; }
-echo_success()  { echo -e "$CHECK $*"; }
-echo_error()    { echo -e "$CROSS $*" >&2; }
+# Helpers
+step() { echo -e "\n${BLUE}${BOLD}📦 $*${RESET}"; }
+info() { echo -e "${BLUE}${BOLD}➤ $*${RESET}"; }
+success() { echo -e "$CHECK $*"; }
+error() { echo -e "$CROSS $*" >&2; }
 
-# =========================
-#     Setup Variables
-# =========================
+# Variables
 INSTALL_DIR="$HOME/.local/share/cursor"
-APPIMAGE_NAME="cursor.AppImage"
-APPIMAGE_URL="https://downloads.cursor.com/production/8ea935e79a50a02da912a034bbeda84a6d3d355d/linux/x64/Cursor-0.50.4-x86_64.AppImage"
+APPIMAGE_NAME="Cursor-1.1.3-x86_64.AppImage"
+APPIMAGE_URL="https://downloads.cursor.com/production/979ba33804ac150108481c14e0b5cb970bda3266/linux/x64/$APPIMAGE_NAME"
 DESKTOP_FILE="$HOME/.local/share/applications/cursor-ai.desktop"
 APP_RUN_PATH="$INSTALL_DIR/squashfs-root/AppRun"
 ICON_PATH="$INSTALL_DIR/squashfs-root/co.anysphere.cursor.png"
 
-# =========================
-#   Check Dependencies
-# =========================
-REQUIRED_CMDS=("curl" "update-desktop-database")
-for cmd in "${REQUIRED_CMDS[@]}"; do
+# Check Dependencies
+REQUIRED=("curl" "update-desktop-database")
+for cmd in "${REQUIRED[@]}"; do
   if ! command -v "$cmd" &>/dev/null; then
-    echo_error "Required command '$cmd' not found. Please install it before continuing."
+    error "Required command '$cmd' not found. Install it and retry."
     exit 1
   fi
 done
 
-# =========================
-#   Already Installed?
-# =========================
+# Already Installed?
 if [[ -f "$APP_RUN_PATH" ]]; then
-  echo_info "Cursor AI is already installed at:"
-  echo -e "  ${BOLD}$APP_RUN_PATH${RESET}"
-  echo_info "Do you want to re-install or update it? [y/N]"
-  read -r REINSTALL
-  [[ ! "$REINSTALL" =~ ^[Yy]$ ]] && echo_info "Aborted by user." && exit 0
+  info "Cursor AI already installed."
+  echo -n "Reinstall/update? [y/N] "
+  read -r yn
+  if [[ ! "$yn" =~ ^[Yy]$ ]]; then
+    info "Okay, exiting."
+    exit 0
+  fi
   rm -rf "$INSTALL_DIR"
 fi
 
-# =========================
-#     Begin Installation
-# =========================
-step "Installing Cursor AI IDE"
-mkdir -p "$INSTALL_DIR"
-cd "$INSTALL_DIR" || { echo_error "Cannot access $INSTALL_DIR"; exit 1; }
+# Install
+step "Installing Cursor AI IDE (v1.1.3)"
 
-# Download Cursor AppImage
-step "Downloading Cursor AppImage"
+mkdir -p "$INSTALL_DIR"
+cd "$INSTALL_DIR" || exit 1
+
+step "Downloading AppImage v1.1.3"
 SPINNER_MSG="Downloading Cursor"
 curl -sSL "$APPIMAGE_URL" -o "$APPIMAGE_NAME" & spinner $!
-wait $!
 
-# Make executable and extract silently
 chmod +x "$APPIMAGE_NAME"
 
 step "Extracting AppImage"
 SPINNER_MSG="Extracting AppImage"
 ./"$APPIMAGE_NAME" --appimage-extract > /dev/null 2>&1 & spinner $!
-wait $!
-rm -f "$APPIMAGE_NAME"
-echo_success "Removed temporary AppImage."
+wait
 
-# =========================
-#     Desktop Entry
-# =========================
+rm -f "$APPIMAGE_NAME"
+success "AppImage extracted and temporary file removed."
+
+# Desktop Entry
 step "Creating desktop launcher"
 mkdir -p "$(dirname "$DESKTOP_FILE")"
-
 cat > "$DESKTOP_FILE" <<EOF
 [Desktop Entry]
 Version=1.0
 Name=Cursor AI IDE
-Comment=AI IDE for developers
+Comment=AI-powered code editor
 Exec=$APP_RUN_PATH
 Icon=$ICON_PATH
 Terminal=false
@@ -121,25 +103,19 @@ EOF
 chmod +x "$DESKTOP_FILE"
 update-desktop-database "$HOME/.local/share/applications" &>/dev/null
 
-# =========================
-#     Add Alias (Optional)
-# =========================
-echo_info "Would you like to add 'cursor' as a terminal command (like 'code')? [y/N]"
-read -r ADD_ALIAS
-if [[ "$ADD_ALIAS" =~ ^[Yy]$ ]]; then
-  SHELL_RC="$HOME/.bashrc"
-  [[ $SHELL =~ "zsh" ]] && SHELL_RC="$HOME/.zshrc"
-  echo "alias cursor=\"$APP_RUN_PATH\"" >> "$SHELL_RC"
-  echo_success "Alias added to $SHELL_RC"
-  echo_info "Restart terminal or run: source $SHELL_RC"
+# Alias Option
+echo -n "Add terminal alias 'cursor'? [y/N] "
+read -r addalias
+if [[ "$addalias" =~ ^[Yy]$ ]]; then
+  SHELLRC="$HOME/.bashrc"
+  [[ $SHELL =~ "zsh" ]] && SHELLRC="$HOME/.zshrc"
+  echo "alias cursor=\"$APP_RUN_PATH\"" >> "$SHELLRC"
+  success "Alias added to $SHELLRC"
+  info "Reload with: source $SHELLRC"
 fi
 
-# =========================
-#     Final Message
-# =========================
-echo -e "\n${GREEN}${BOLD}🎉 Cursor AI IDE installed successfully!${RESET}"
-echo -e "  • Launch from Applications menu"
-echo -e "  • Or run: ${BOLD}$APP_RUN_PATH${RESET}"
-[[ "$ADD_ALIAS" =~ ^[Yy]$ ]] && echo -e "  • Or just type: ${BOLD}cursor${RESET}"
-
+echo -e "\n${GREEN}${BOLD}🎉 Cursor AI v1.1.3 installed!${RESET}"
+echo "• Open from applications menu"
+echo "• Run: $APP_RUN_PATH"
+[[ "$addalias" =~ ^[Yy]$ ]] && echo "• Or type: cursor"
 exit 0
