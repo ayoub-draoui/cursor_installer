@@ -22,6 +22,10 @@ A collection of **automated installer scripts** for [Cursor AI](https://cursor.c
 
 ---
 
+### [🗂️ View Git Diagram](https://gitdiagram-web-900779586767.us-central1.run.app/Shifuuu31/cursor_installer?username=Shifuuu31&repo=cursor_installer)
+
+---
+
 ## 🧠 What is Cursor?
 
 **Cursor** is an AI-powered code editor built on Visual Studio Code. Think of it as VS Code with superpowers:
@@ -105,7 +109,6 @@ chmod +x fix_dns_script.sh
 chmod +x cursor_uninstall_script.sh
 ./cursor_uninstall_script.sh
 ```
-
 ---
 
 ## 📋 Requirements
